@@ -1,0 +1,6 @@
+name: generators
+version: '0.0.1'
+main: pet.lily.generators.Generators
+api-version: '1.21'
+authors: [ lily ]
+website: https://pixie.rip
