@@ -6,7 +6,8 @@ import pet.lily.generators.utils.getImplementations
 
 class Generators : JavaPlugin() {
     override fun onEnable() {
-        getImplementations<Manager>("pet.lily.manager").forEach {
+        getImplementations<Manager>("pet.lily.generators.manager").forEach {
+            plugin.logger.fine { "initializing manager $it" }
             it.initialize(plugin)
         }
     }
