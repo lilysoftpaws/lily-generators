@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm") version "2.1.20-Beta1"
 //    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
@@ -29,8 +31,16 @@ dependencies {
 //    implementation("com.google.auto.service:auto-service-annotations:1.11.0")
 //    ksp("com.google.auto.service:auto-service:1.11.0")
 
-    implementation("com.akuleshov7:ktoml-core:0.5.2")
+    // reflection
     implementation("org.reflections:reflections:0.10.2")
+
+    // database
+    implementation("org.jetbrains.exposed:exposed-core:0.57.0")
+    implementation("org.jetbrains.exposed:exposed-dao:0.57.0")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.57.0")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    implementation("org.flywaydb:flyway-core:11.1.1")
+    implementation("org.xerial:sqlite-jdbc:3.47.2.0")
 }
 
 val targetJavaVersion = 21
@@ -54,5 +64,9 @@ tasks {
         filesMatching("plugin.yml") {
             expand(props)
         }
+    }
+
+    withType<ShadowJar> {
+        mergeServiceFiles()
     }
 }
