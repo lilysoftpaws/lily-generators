@@ -15,7 +15,7 @@ object PlayerRepository {
     fun createPlayer(playerId: UUID): Player = dbLock.write {
         transaction {
             Player.new(playerId) {
-                this.lastLogin = System.currentTimeMillis()
+
             }
         }
     }
