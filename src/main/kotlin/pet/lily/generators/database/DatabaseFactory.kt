@@ -3,8 +3,8 @@ package pet.lily.generators.database
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.flywaydb.core.Flyway
-import pet.lily.generators.database.tables.Generators
-import pet.lily.generators.database.tables.Players
+import pet.lily.generators.database.tables.GeneratorTable
+import pet.lily.generators.database.tables.PlayerTable
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
 object DatabaseFactory {
@@ -29,7 +29,7 @@ object DatabaseFactory {
         transaction {
             addLogger(StdOutSqlLogger)
 
-            SchemaUtils.create(Players, Generators)
+            SchemaUtils.create(PlayerTable, GeneratorTable)
         }
     }
 }

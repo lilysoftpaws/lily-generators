@@ -5,22 +5,22 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
-import pet.lily.generators.database.tables.Generators
+import pet.lily.generators.database.tables.GeneratorTable
 
-class Generator(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Generator>(Generators) {
-        fun findByPosition(x: Int, y: Int, z: Int): Generator? = transaction {
-            Generator.find {
-                (Generators.x eq x) and
-                        (Generators.y eq y) and
-                        (Generators.z eq z)
+class GeneratorEntity(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<GeneratorEntity>(GeneratorTable) {
+        fun findByPosition(x: Int, y: Int, z: Int): GeneratorEntity? = transaction {
+            GeneratorEntity.find {
+                (GeneratorTable.x eq x) and
+                        (GeneratorTable.y eq y) and
+                        (GeneratorTable.z eq z)
             }.firstOrNull()
         }
     }
 
-    var type by Generators.type
-    var x by Generators.x
-    var y by Generators.y
-    var z by Generators.z
-    var player by Player referencedOn Generators.player
+    var type by GeneratorTable.type
+    var x by GeneratorTable.x
+    var y by GeneratorTable.y
+    var z by GeneratorTable.z
+    var player by PlayerEntity referencedOn GeneratorTable.player
 }

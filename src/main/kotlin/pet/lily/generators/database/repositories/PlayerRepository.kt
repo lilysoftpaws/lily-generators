@@ -4,34 +4,34 @@ import org.bukkit.Location
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import pet.lily.generators.database.DatabaseFactory.dbLock
-import pet.lily.generators.database.entities.Generator
-import pet.lily.generators.database.entities.Player
-import pet.lily.generators.database.tables.Generators
+import pet.lily.generators.database.entities.GeneratorEntity
+import pet.lily.generators.database.entities.PlayerEntity
+import pet.lily.generators.database.tables.GeneratorTable
 import java.util.UUID
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 object PlayerRepository {
-    fun createPlayer(playerId: UUID): Player = dbLock.write {
+    fun createPlayer(playerId: UUID): PlayerEntity = dbLock.write {
         transaction {
-            Player.new(playerId) {
+            PlayerEntity.new(playerId) {
 
             }
         }
     }
 
-    fun getPlayer(playerId: UUID): Player? = dbLock.read {
-        Player.findById(playerId)
+    fun getPlayer(playerId: UUID): PlayerEntity? = dbLock.read {
+        PlayerEntity.findById(playerId)
     }
 
-    fun addGenerator(playerId: UUID, type: String, location: Location): Generator? {
+    fun addGenerator(playerId: UUID, type: String, location: Location): GeneratorEntity? {
         return addGenerator(playerId, type, location.blockX, location.blockY, location.blockZ)
     }
 
-    fun addGenerator(playerId: UUID, type: String, x: Int, y: Int, z: Int): Generator? = dbLock.write {
+    fun addGenerator(playerId: UUID, type: String, x: Int, y: Int, z: Int): GeneratorEntity? = dbLock.write {
         transaction {
-            val player = Player.findById(playerId) ?: return@transaction null
-            Generator.new {
+            val player = PlayerEntity.findById(playerId) ?: return@transaction null
+            GeneratorEntity.new {
                 this.player = player
                 this.type = type
                 this.x = x
@@ -41,23 +41,23 @@ object PlayerRepository {
         }
     }
 
-    fun getGenerator(location: Location): Generator? {
+    fun getGenerator(location: Location): GeneratorEntity? {
         return getGenerator(location.blockX, location.blockY, location.blockZ)
     }
 
-    fun getGenerator(x: Int, y: Int, z: Int): Generator? = dbLock.read {
+    fun getGenerator(x: Int, y: Int, z: Int): GeneratorEntity? = dbLock.read {
         transaction {
-            Generator.find {
-                Generators.x eq x and
-                        (Generators.y eq y) and
-                        (Generators.z eq z)
+            GeneratorEntity.find {
+                GeneratorTable.x eq x and
+                        (GeneratorTable.y eq y) and
+                        (GeneratorTable.z eq z)
             }
         }.firstOrNull()
     }
 
-    fun getGeneratorsForPlayer(playerId: UUID): List<Generator> = dbLock.read {
+    fun getGeneratorsForPlayer(playerId: UUID): List<GeneratorEntity> = dbLock.read {
         transaction {
-            Generator.find { Generators.player eq playerId }.toList()
+            GeneratorEntity.find { GeneratorTable.player eq playerId }.toList()
         }
     }
 }
