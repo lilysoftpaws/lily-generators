@@ -13,6 +13,5 @@ class Player(id: EntityID<UUID>) : UUIDEntity(id) {
 
     }
 
-    var lastLogin by Players.lastLogin
     val generators by Generator referrersOn Generators.player
 }
