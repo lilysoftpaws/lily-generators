@@ -3,6 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     kotlin("jvm") version "2.1.20-Beta1"
 //    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+    kotlin("plugin.serialization") version "2.1.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
@@ -41,6 +42,9 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     implementation("org.flywaydb:flyway-core:11.1.1")
     implementation("org.xerial:sqlite-jdbc:3.47.2.0")
+
+    // configuration
+    implementation("com.akuleshov7:ktoml-core:0.5.1")
 }
 
 val targetJavaVersion = 21
