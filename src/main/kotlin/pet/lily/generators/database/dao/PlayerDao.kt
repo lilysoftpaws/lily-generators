@@ -2,7 +2,7 @@ package pet.lily.generators.database.dao
 
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import pet.lily.generators.database.model.PlayerModel
@@ -12,7 +12,7 @@ import java.util.UUID
 object PlayerDao {
     fun createPlayer(playerId: UUID): PlayerModel = transaction {
         PlayerTable
-            .insertAndGetId {
+            .insert {
                 it[PlayerTable.id] = playerId
             }
         PlayerModel(playerId)
