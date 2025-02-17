@@ -1,15 +1,16 @@
-CREATE TABLE IF NOT EXISTS players (
-    id BINARY(16) NOT NULL PRIMARY KEY
+CREATE TABLE players (
+    id TEXT PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS generators (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    "type" VARCHAR(30) NOT NULL,
+CREATE TABLE generators (
+    id TEXT PRIMARY KEY,
+    type VARCHAR(32) NOT NULL,
     x INT NOT NULL,
     y INT NOT NULL,
     z INT NOT NULL,
-    player_id BINARY(16) NOT NULL,
-    CONSTRAINT fk_generators_player_id FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    player_id TEXT NOT NULL,
+    CONSTRAINT fk_player FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE,
+    CONSTRAINT unique_location UNIQUE (x, y, z)
 );
 
-CREATE UNIQUE INDEX generators_player_id_type_x_y_z ON generators (player_id, "type", x, y, z);
+CREATE INDEX idx_player_id ON generators (player_id);

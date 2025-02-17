@@ -1,15 +1,16 @@
 package pet.lily.generators.database.tables
 
-import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
+import org.jetbrains.exposed.sql.ReferenceOption
 
-object GeneratorTable : IntIdTable("generators") {
-    val type = varchar("type", 30)
+object GeneratorTable : UUIDTable("generators") {
+    val type = varchar("type", 32)
     val x = integer("x")
     val y = integer("y")
     val z = integer("z")
-    val player = reference("player_id", PlayerTable)
+    val player = reference("player_id", PlayerTable, onDelete = ReferenceOption.CASCADE).index()
 
     init {
-        index(true, player, type, x, y, z)
+        uniqueIndex("unique_location", x, y, z)
     }
 }

@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import pet.lily.generators.Generators
-import pet.lily.generators.database.repositories.PlayerRepository
+import pet.lily.generators.database.dao.PlayerDao
 
 @Suppress("unused")
 object PlayerManager : Manager, Listener {
@@ -14,8 +14,8 @@ object PlayerManager : Manager, Listener {
 
     @EventHandler
     fun PlayerJoinEvent.onPlayerJoin() {
-        if (PlayerRepository.getPlayer(player.uniqueId) == null) {
-            PlayerRepository.createPlayer(player.uniqueId)
+        if (PlayerDao.getPlayerById(player.uniqueId) == null) {
+            PlayerDao.createPlayer(player.uniqueId)
         }
     }
 }
