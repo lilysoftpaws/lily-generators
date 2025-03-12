@@ -1,4 +1,4 @@
-package pet.lily.generators.manager
+package pet.lily.generators.managers
 
 import pet.lily.generators.Generators
 

@@ -1,13 +1,11 @@
 package pet.lily.generators.database.dao
 
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import pet.lily.generators.database.model.GeneratorModel
-import pet.lily.generators.database.model.Location
 import pet.lily.generators.database.tables.GeneratorTable
 import java.util.UUID
 
@@ -16,6 +14,7 @@ object GeneratorDao {
         val id = GeneratorTable
             .insertAndGetId {
                 it[GeneratorTable.type] = type
+                it[GeneratorTable.world] = location.world?.name ?: "world"
                 it[GeneratorTable.x] = location.x
                 it[GeneratorTable.y] = location.y
                 it[GeneratorTable.z] = location.z
@@ -28,18 +27,12 @@ object GeneratorDao {
         GeneratorTable
             .selectAll()
             .where {
-                GeneratorTable.x eq location.x and
+                (GeneratorTable.world eq (location.world?.name ?: "world")) and
+                        (GeneratorTable.x eq location.x) and
                         (GeneratorTable.y eq location.y) and
                         (GeneratorTable.z eq location.z)
             }
-            .mapNotNull {
-                GeneratorModel(
-                    it[GeneratorTable.id].value,
-                    it[GeneratorTable.type],
-                    Location(it[GeneratorTable.x], it[GeneratorTable.y], it[GeneratorTable.z]),
-                    it[GeneratorTable.player].value
-                )
-            }
+            .mapNotNull { it.toGeneratorModel() }
             .singleOrNull()
     }
 
@@ -47,31 +40,34 @@ object GeneratorDao {
         GeneratorTable
             .selectAll()
             .where { GeneratorTable.player eq playerId }
-            .map {
-                GeneratorModel(
-                    it[GeneratorTable.id].value,
-                    it[GeneratorTable.type],
-                    Location(it[GeneratorTable.x], it[GeneratorTable.y], it[GeneratorTable.z]),
-                    it[GeneratorTable.player].value
-                )
-            }
+            .map { it.toGeneratorModel() }
     }
 
     fun getAllGenerators(): List<GeneratorModel> = transaction {
         GeneratorTable
             .selectAll()
-            .map {
-                GeneratorModel(
-                    it[GeneratorTable.id].value,
-                    it[GeneratorTable.type],
-                    Location(it[GeneratorTable.x], it[GeneratorTable.y], it[GeneratorTable.z]),
-                    it[GeneratorTable.player].value
-                )
-            }
+            .map { it.toGeneratorModel() }
     }
 
     fun deleteGenerator(generatorId: UUID): Boolean = transaction {
         val deletedRows = GeneratorTable.deleteWhere { GeneratorTable.id eq generatorId }
         deletedRows > 0
+    }
+
+    private fun ResultRow.toGeneratorModel(): GeneratorModel {
+        val world = Bukkit.getWorld(this[GeneratorTable.world])
+            ?: Bukkit.getWorlds().firstOrNull()
+
+        return GeneratorModel(
+            id = this[GeneratorTable.id].value,
+            type = this[GeneratorTable.type],
+            location = Location(
+                world,
+                this[GeneratorTable.x],
+                this[GeneratorTable.y],
+                this[GeneratorTable.z]
+            ),
+            playerId = this[GeneratorTable.player].value
+        )
     }
 }

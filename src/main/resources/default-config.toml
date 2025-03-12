@@ -1,5 +1,0 @@
-[main]
-generator-tick-rate = 20 # ticks between generator updates
-
-[database]
-database-path = "database.sqlite"

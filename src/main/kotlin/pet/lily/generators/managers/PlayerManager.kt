@@ -1,4 +1,4 @@
-package pet.lily.generators.manager
+package pet.lily.generators.managers
 
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

@@ -1,0 +1,36 @@
+---
+main:
+  generator-tick-rate: 20  # ticks between generator spawns
+database:
+  database-path: database.sqlite
+generators:
+  types:
+    iron-generator:
+      material: minecraft:iron_block
+      display-name: <grey>Iron Generator
+      lore:
+        - <grey>Generates iron ingots over time.
+        - <grey>Place to activate.
+      price: 10.0
+      drop: iron-drop
+    gold-generator:
+      material: GOLD_BLOCK
+      display-name: <gold>Gold Generator
+      lore:
+        - <gold>Generates gold ingots over time.
+        - <gold>Place to activate.
+      price: 20.0
+      drop: gold-drop
+  drops:
+    iron-drop:
+      material: IRON_INGOT
+      display-name: <grey>Iron Ingot
+      lore:
+        - <grey>A precious metal obtained from iron generators.
+      value: 10.0
+    gold-drop:
+      material: GOLD_INGOT
+      display-name: <gold>Gold Ingot
+      lore:
+        - <gold>A precious metal obtained from gold generators.
+      value: 20.0
