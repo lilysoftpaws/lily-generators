@@ -10,7 +10,6 @@ import org.incendo.cloud.context.CommandContext
 import pet.lily.generators.registry.GeneratorRegistry
 
 object GeneratorsCommand {
-
     @Command("generators give <type> [target] [quantity]")
     @Permission("generators.give")
     fun generatorsGiveCommand(

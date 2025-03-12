@@ -42,7 +42,11 @@ object GeneratorManager : Manager, Listener {
     @EventHandler
     fun BlockBreakEvent.onBlockBreak() {
         GeneratorDao.getGeneratorByLocation(block.location)?.let {
-            isCancelled = true
+            player.permissionValue("generators.break").let { canBreak ->
+                if (canBreak.toBoolean() != true) {
+                    isCancelled = true
+                }
+            }
         }
     }
 
@@ -52,6 +56,7 @@ object GeneratorManager : Manager, Listener {
 
         val block = event.clickedBlock ?: return
         val generator = GeneratorDao.getGeneratorByLocation(block.location) ?: return
+        val generatorType = GeneratorRegistry.processedGenerators[generator.type] ?: return
 
         if (generator.playerId != event.player.uniqueId) return
 
@@ -62,6 +67,6 @@ object GeneratorManager : Manager, Listener {
 
         GeneratorDao.deleteGenerator(generator.id)
 
-        event.player.inventory.addItem(GeneratorRegistry.processedGenerators[generator.type]?.itemTemplate ?: return)
+        event.player.inventory.addItem(generatorType.itemTemplate)
     }
 }

@@ -1,18 +1,15 @@
 package pet.lily.generators
 
-import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.incendo.cloud.SenderMapper
 import org.incendo.cloud.annotations.AnnotationParser
 import org.incendo.cloud.annotations.Command
-import org.incendo.cloud.annotations.suggestion.Suggestions
 import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.kotlin.coroutines.annotations.installCoroutineSupport
 import org.incendo.cloud.paper.LegacyPaperCommandManager
 import pet.lily.generators.database.DatabaseFactory
 import pet.lily.generators.managers.Manager
-import pet.lily.generators.registry.GeneratorRegistry
 import pet.lily.generators.utils.*
 import java.io.File
 

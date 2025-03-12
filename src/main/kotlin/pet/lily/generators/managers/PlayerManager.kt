@@ -15,6 +15,7 @@ object PlayerManager : Manager, Listener {
     @EventHandler
     fun PlayerJoinEvent.onPlayerJoin() {
         if (PlayerDao.getPlayerById(player.uniqueId) == null) {
+            // todo: store locale for i18n
             PlayerDao.createPlayer(player.uniqueId)
         }
     }
