@@ -5,10 +5,10 @@ CREATE TABLE players (
 CREATE TABLE generators (
     id TEXT PRIMARY KEY,
     type VARCHAR(32) NOT NULL,
-    world TEXT NOT NULL DEFAULT 'world',
-    x REAL NOT NULL DEFAULT 0.0,
-    y REAL NOT NULL DEFAULT 0.0,
-    z REAL NOT NULL DEFAULT 0.0,
+    world TEXT NOT NULL,
+    x REAL NOT NULL,
+    y REAL NOT NULL,
+    z REAL NOT NULL,
     player_id TEXT NOT NULL,
     CONSTRAINT fk_player FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE,
     CONSTRAINT unique_location UNIQUE (world, x, y, z)
