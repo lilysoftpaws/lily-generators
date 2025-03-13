@@ -14,6 +14,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.persistence.PersistentDataType
 import pet.lily.generators.Generators
 import pet.lily.generators.database.dao.GeneratorDao
+import pet.lily.generators.localization.sendLocalizedMessage
 import pet.lily.generators.plugin
 import pet.lily.generators.registry.GeneratorRegistry
 import pet.lily.generators.utils.ItemStackUtils.getPersistentData
@@ -28,15 +29,21 @@ object GeneratorManager : Manager, Listener {
 
     @EventHandler
     fun BlockPlaceEvent.onBlockPlace() {
-        val generatorType = itemInHand.getPersistentData(generatorTypeKey, PersistentDataType.STRING)
-            ?: return
+        // check if held item is a generator
+        val generatorType = itemInHand.getPersistentData(generatorTypeKey, PersistentDataType.STRING) ?: return
+        val generatorData = GeneratorRegistry.processedGenerators[generatorType] ?: return
 
         // todo: check generator slots
 
-        // todo: configuration for language and sound
+        // play sound and send message
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_FLUTE, 2f, 2f)
-        player.sendMessage("you have placed a $generatorType")
 
+        player.sendLocalizedMessage(
+            key = "generators.place.success",
+            placeholders = mapOf("display-name" to generatorData.displayName)
+        )
+
+        // create generator in database
         GeneratorDao.createGenerator(generatorType, blockPlaced.location, player.uniqueId)
     }
 
@@ -56,22 +63,25 @@ object GeneratorManager : Manager, Listener {
         if (action != Action.LEFT_CLICK_BLOCK || hand != EquipmentSlot.HAND) return
 
         val block = clickedBlock ?: return
-        val generator = GeneratorDao.getGeneratorByLocation(block.location) ?: return
-        val generatorType = GeneratorRegistry.processedGenerators[generator.type] ?: return
+        val generatorData = GeneratorDao.getGeneratorByLocation(block.location) ?: return
+        val generatorType = GeneratorRegistry.processedGenerators[generatorData.type] ?: return
 
         // check if player owns the generator
-        if (generator.playerId != player.uniqueId) return
+        if (generatorData.playerId != player.uniqueId) return
 
         // cancel the event and remove the generator
         isCancelled = true
         block.type = Material.AIR
 
-        // todo: configuration for language and sound
+        // play sound and send message
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_FLUTE, 2f, 2f)
-        player.sendMessage("you have picked up a ${generator.type}")
+        player.sendLocalizedMessage(
+            key = "generators.pickup.success",
+            placeholders = mapOf("display-name" to generatorType.displayName)
+        )
 
         // remove the generator from the database
-        GeneratorDao.deleteGenerator(generator.id)
+        GeneratorDao.deleteGenerator(generatorData.id)
 
         // return the generator to the player's inventory
         player.inventory.addItem(generatorType.itemTemplate)

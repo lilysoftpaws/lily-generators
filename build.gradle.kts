@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.1.20-RC2"
+    kotlin("jvm") version "2.1.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
     id("com.gradleup.shadow") version "9.0.0-beta8"
     id("xyz.jpenilla.run-paper") version "2.3.1"
@@ -28,11 +28,10 @@ dependencies {
 
     implementation("org.reflections:reflections:0.10.2")
 
-    implementation("org.jetbrains.exposed:exposed-core:0.57.0")
-    implementation("org.jetbrains.exposed:exposed-dao:0.57.0")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.57.0")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
-    implementation("org.flywaydb:flyway-core:11.1.1")
+    implementation("org.jetbrains.exposed:exposed-core:0.60.0")
+    implementation("org.jetbrains.exposed:exposed-dao:0.60.0")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.60.0")
+    implementation("org.flywaydb:flyway-core:11.4.0")
     implementation("org.xerial:sqlite-jdbc:3.47.2.0")
 
     implementation("org.incendo:cloud-core:2.0.0")

@@ -6,5 +6,6 @@ import java.util.UUID
 
 @Serializable
 data class PlayerModel(
-    @Contextual val id: UUID
+    @Contextual val id: UUID,
+    val locale: String
 )

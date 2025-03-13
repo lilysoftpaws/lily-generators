@@ -11,8 +11,8 @@ import pet.lily.generators.utils.MiniMessageUtils.asComponent
 data class ProcessedDrop(
     val id: String,
     val material: Material,
-    val displayName: Component?,
-    val lore: List<Component>?,
+    val displayName: Component,
+    val lore: List<Component>,
     val value: Double,
     val itemTemplate: ItemStack
 )
@@ -20,8 +20,8 @@ data class ProcessedDrop(
 data class ProcessedGenerator(
     val id: String,
     val material: Material,
-    val displayName: Component?,
-    val lore: List<Component>?,
+    val displayName: Component,
+    val lore: List<Component>,
     val price: Double,
     val drop: ProcessedDrop,
     val itemTemplate: ItemStack
@@ -39,7 +39,7 @@ object GeneratorRegistry {
     val processedDrops: Map<String, ProcessedDrop> = plugin.configuration.generators.drops.mapNotNull { (id, dropConfig) ->
         val material = Material.matchMaterial(dropConfig.material)
         if (material == null) {
-            plugin.logger.warning { "invalid material for drop '$id': ${dropConfig.material}" }
+            plugin.logger.warning { "Invalid material for drop '$id': ${dropConfig.material}" }
             return@mapNotNull null
         }
 
@@ -60,7 +60,7 @@ object GeneratorRegistry {
     val processedGenerators: Map<String, ProcessedGenerator> = plugin.configuration.generators.types.mapNotNull { (id, typeConfig) ->
         val material = Material.matchMaterial(typeConfig.material)
         if (material == null) {
-            plugin.logger.warning { "invalid material for generator '$id': ${typeConfig.material}" }
+            plugin.logger.warning { "Invalid material for generator '$id': ${typeConfig.material}" }
             return@mapNotNull null
         }
 
@@ -69,7 +69,7 @@ object GeneratorRegistry {
         val drop = processedDrops[typeConfig.drop]
 
         if (drop == null) {
-            plugin.logger.warning { "generator '$id' references unknown drop '${typeConfig.drop}'" }
+            plugin.logger.warning { "Generator '$id' references unknown drop '${typeConfig.drop}'" }
             return@mapNotNull null
         }
 

@@ -7,6 +7,9 @@ import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Permission
 import org.incendo.cloud.annotations.suggestion.Suggestions
 import org.incendo.cloud.context.CommandContext
+import pet.lily.generators.database.dao.PlayerDao
+import pet.lily.generators.localization.LocalizationManager
+import pet.lily.generators.localization.sendLocalizedMessage
 import pet.lily.generators.registry.GeneratorRegistry
 
 object GeneratorsCommand {
@@ -18,18 +21,64 @@ object GeneratorsCommand {
         @Argument("target") target: Player = sender,
         @Argument("quantity") quantity: Int = 1
     ) {
-        val generator = GeneratorRegistry.processedGenerators[type]
+        val generatorData= GeneratorRegistry.processedGenerators[type]
             ?: run {
-                sender.sendMessage("[generators] generator type '$type' not found")
+                sender.sendLocalizedMessage(
+                    key = "generators.give.error",
+                    placeholders = mapOf("type" to type)
+                )
                 return
             }
 
-        val item = generator.itemTemplate.clone().apply {
+        val item = generatorData.itemTemplate.clone().apply {
             amount = quantity.coerceIn(1, 64)
         }
 
         target.inventory.addItem(item)
-        sender.sendMessage("[generators] gave ${item.amount}x $type to ${target.name}")
+        sender.sendLocalizedMessage(
+            key = "generators.give.success",
+            placeholders = mapOf(
+                "quantity" to item.amount.toString(),
+                "display-name" to generatorData.displayName,
+                "target" to target.name
+            )
+        )
+    }
+
+    @Command("generators locale [locale]")
+    @Permission("generators.locale")
+    fun locale(
+        sender: Player,
+        @Argument("locale", suggestions = "locale-suggestions") locale: String
+    ) {
+        if (locale.isEmpty()) {
+            val playerModel = PlayerDao.getPlayerById(sender.uniqueId) ?: return
+            sender.sendLocalizedMessage(
+                key = "locale.current",
+                placeholders = mapOf("locale" to playerModel.locale)
+            )
+            return
+        }
+
+        val availableLocales = LocalizationManager.availableLocales
+        if (!availableLocales.contains(locale)) {
+            sender.sendLocalizedMessage(
+                key = "locale.invalid",
+                placeholders = mapOf("locale" to locale)
+            )
+            return
+        }
+
+        val updateSuccess = PlayerDao.updatePlayerLocale(sender.uniqueId, locale)
+        sender.sendLocalizedMessage(
+            key = if (updateSuccess) "locale.updated" else "locale.error",
+            placeholders = mapOf("locale" to locale)
+        )
+    }
+
+    @Suggestions("locale-suggestions")
+    fun localeSuggestions(context: CommandContext<CommandSender>, input: String): List<String> {
+        return LocalizationManager.availableLocales.filter { it.startsWith(input, ignoreCase = true) }
     }
 
     @Suggestions("generator-type-suggestions")
@@ -38,4 +87,3 @@ object GeneratorsCommand {
             .filter { it.startsWith(input, true) }
     }
 }
-

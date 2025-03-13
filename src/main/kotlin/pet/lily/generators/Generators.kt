@@ -9,9 +9,11 @@ import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.kotlin.coroutines.annotations.installCoroutineSupport
 import org.incendo.cloud.paper.LegacyPaperCommandManager
 import pet.lily.generators.database.DatabaseFactory
+import pet.lily.generators.localization.LocalizationManager
 import pet.lily.generators.managers.Manager
 import pet.lily.generators.utils.ReflectionUtils
 import java.io.File
+import kotlin.math.log
 
 class Generators : JavaPlugin() {
 
@@ -24,7 +26,8 @@ class Generators : JavaPlugin() {
 
         // load configuration
         configuration = loadConfiguration(File(dataFolder, "config.yaml").path)
-        logger.info { "loaded ${configuration.generators.types.size} generators and ${configuration.generators.drops.size} drops" }
+        logger.info { "Loaded ${configuration.generators.types.size} generators and ${configuration.generators.drops.size} drops" }
+        logger.info { "Available locales: ${LocalizationManager.availableLocales.joinToString(", ")}" }
 
         // initialize database
         DatabaseFactory.initialize(File(dataFolder, configuration.database.databasePath).path)
@@ -32,7 +35,7 @@ class Generators : JavaPlugin() {
         // initialize managers
         ReflectionUtils.getImplementations<Manager>("pet.lily.generators.managers").forEach {
             it.initialize(plugin)
-            plugin.logger.fine { "initialized manager $it" }
+            plugin.logger.fine { "Initialized manager $it" }
         }
 
         // initialize commands and suggestions
@@ -46,7 +49,7 @@ class Generators : JavaPlugin() {
 
         instances.forEach { instance ->
             annotationParser.parse(instance)
-            plugin.logger.fine { "registered command from ${instance::class.simpleName}" }
+            plugin.logger.fine { "Registered command from ${instance::class.simpleName}" }
         }
     }
 }

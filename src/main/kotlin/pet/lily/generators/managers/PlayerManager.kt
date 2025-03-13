@@ -5,6 +5,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import pet.lily.generators.Generators
 import pet.lily.generators.database.dao.PlayerDao
+import pet.lily.generators.localization.LocalizationManager
 
 @Suppress("unused")
 object PlayerManager : Manager, Listener {
@@ -15,8 +16,13 @@ object PlayerManager : Manager, Listener {
     @EventHandler
     fun PlayerJoinEvent.onPlayerJoin() {
         if (PlayerDao.getPlayerById(player.uniqueId) == null) {
-            // todo: store locale for i18n
-            PlayerDao.createPlayer(player.uniqueId)
+            val availableLocales = LocalizationManager.availableLocales
+            val playerLocale = player.locale().toString()
+
+            PlayerDao.createPlayer(
+                player.uniqueId,
+                if (availableLocales.contains(playerLocale)) playerLocale else "en_US"
+            )
         }
     }
 }
