@@ -3,7 +3,7 @@ package pet.lily.generators.database.model
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.bukkit.Location
-import pet.lily.generators.database.serialization.LocationSerializer
+import pet.lily.generators.utils.LocationSerializer
 import java.util.UUID
 
 @Serializable

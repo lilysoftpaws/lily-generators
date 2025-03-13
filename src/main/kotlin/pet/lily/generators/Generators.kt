@@ -10,7 +10,7 @@ import org.incendo.cloud.kotlin.coroutines.annotations.installCoroutineSupport
 import org.incendo.cloud.paper.LegacyPaperCommandManager
 import pet.lily.generators.database.DatabaseFactory
 import pet.lily.generators.managers.Manager
-import pet.lily.generators.utils.*
+import pet.lily.generators.utils.ReflectionUtils
 import java.io.File
 
 class Generators : JavaPlugin() {
@@ -30,7 +30,7 @@ class Generators : JavaPlugin() {
         DatabaseFactory.initialize(File(dataFolder, configuration.database.databasePath).path)
 
         // initialize managers
-        getImplementations<Manager>("pet.lily.generators.managers").forEach {
+        ReflectionUtils.getImplementations<Manager>("pet.lily.generators.managers").forEach {
             it.initialize(plugin)
             plugin.logger.fine { "initialized manager $it" }
         }
@@ -41,7 +41,7 @@ class Generators : JavaPlugin() {
         annotationParser.installCoroutineSupport()
 
         val instances = listOf(
-            getAnnotatedMethods<Command>("pet.lily.generators.commands").map { it.first },
+            ReflectionUtils.getAnnotatedMethods<Command>("pet.lily.generators.commands").map { it.first },
         ).flatten().distinct()
 
         instances.forEach { instance ->

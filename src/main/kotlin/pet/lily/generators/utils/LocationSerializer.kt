@@ -1,4 +1,4 @@
-package pet.lily.generators.database.serialization
+package pet.lily.generators.utils
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.*
@@ -6,6 +6,9 @@ import kotlinx.serialization.encoding.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
 
+/**
+ * A custom serializer for Bukkit [Location] objects.
+ */
 object LocationSerializer : KSerializer<Location> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Location") {
         element<String>("world")

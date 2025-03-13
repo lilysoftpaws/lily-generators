@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import pet.lily.generators.managers.GeneratorManager
 import pet.lily.generators.plugin
-import pet.lily.generators.utils.mm
+import pet.lily.generators.utils.MiniMessageUtils.asComponent
 
 data class ProcessedDrop(
     val id: String,
@@ -43,8 +43,8 @@ object GeneratorRegistry {
             return@mapNotNull null
         }
 
-        val displayName = dropConfig.displayName.mm()
-        val lore = dropConfig.lore.map { it.mm() }
+        val displayName = dropConfig.displayName.asComponent()
+        val lore = dropConfig.lore.map { it.asComponent() }
         val template = buildItemTemplate(material, displayName, lore)
 
         id to ProcessedDrop(
@@ -64,8 +64,8 @@ object GeneratorRegistry {
             return@mapNotNull null
         }
 
-        val displayName = typeConfig.displayName.mm()
-        val lore = typeConfig.lore.map { it.mm() }
+        val displayName = typeConfig.displayName.asComponent()
+        val lore = typeConfig.lore.map { it.asComponent() }
         val drop = processedDrops[typeConfig.drop]
 
         if (drop == null) {
