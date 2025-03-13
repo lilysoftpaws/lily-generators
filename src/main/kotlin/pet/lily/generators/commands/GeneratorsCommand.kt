@@ -12,7 +12,7 @@ import pet.lily.generators.registry.GeneratorRegistry
 object GeneratorsCommand {
     @Command("generators give <type> [target] [quantity]")
     @Permission("generators.give")
-    fun generatorsGiveCommand(
+    fun give(
         sender: Player,
         @Argument("type", suggestions = "generator-type-suggestions") type: String,
         @Argument("target") target: Player = sender,
