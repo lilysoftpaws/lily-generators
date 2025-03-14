@@ -21,7 +21,7 @@ object PlayerManager : Manager, Listener {
 
             PlayerDao.createPlayer(
                 player.uniqueId,
-                if (availableLocales.contains(playerLocale)) playerLocale else "en_US"
+                if (availableLocales.contains(playerLocale)) playerLocale else "en"
             )
         }
     }
