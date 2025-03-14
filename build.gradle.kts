@@ -16,6 +16,7 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://oss.sonatype.org/content/groups/public/")
     maven("https://repo.codemc.org/repository/maven-public/")
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -23,6 +24,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     implementation("com.charleskorn.kaml:kaml:0.72.0")
 
@@ -39,6 +41,8 @@ dependencies {
     implementation("org.incendo:cloud-kotlin-extensions:2.0.0")
     implementation("org.incendo:cloud-kotlin-coroutines:2.0.0")
     implementation("org.incendo:cloud-kotlin-coroutines-annotations:2.0.0")
+
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
 }
 
 val targetJavaVersion = 23
@@ -49,6 +53,10 @@ kotlin {
 tasks {
     runServer {
         minecraftVersion("1.21.4")
+        downloadPlugins {
+            github("EssentialsX", "Essentials", "2.20.1", "EssentialsX-2.20.1.jar")
+            url("https://www.spigotmc.org/resources/vault.34315/download?version=344916")
+        }
     }
 
     build {

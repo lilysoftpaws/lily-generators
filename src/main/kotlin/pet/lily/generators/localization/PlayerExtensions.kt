@@ -22,9 +22,8 @@ fun Player.sendLocalizedMessage(
 
     val resolvedPlaceholders = placeholders.mapValues { (_, value) ->
         when (value) {
-            is String -> value.asComponent()
             is Component -> value
-            else -> throw IllegalArgumentException("Unsupported placeholder value type: ${value::class.simpleName}")
+            else -> value.toString().asComponent()
         }
     }
 

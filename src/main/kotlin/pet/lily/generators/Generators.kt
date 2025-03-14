@@ -1,5 +1,6 @@
 package pet.lily.generators
 
+import net.milkbowl.vault.economy.Economy
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.incendo.cloud.SenderMapper
@@ -13,15 +14,20 @@ import pet.lily.generators.localization.LocalizationManager
 import pet.lily.generators.managers.Manager
 import pet.lily.generators.utils.ReflectionUtils
 import java.io.File
-import kotlin.math.log
 
 class Generators : JavaPlugin() {
 
     lateinit var configuration: Configuration
+    lateinit var economy: Economy
 
     override fun onEnable() {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs()
+        }
+
+        if (!setupEconomy()) {
+            logger.warning { "Vault not found, disabling plugin" }
+            return
         }
 
         // load configuration
@@ -52,6 +58,12 @@ class Generators : JavaPlugin() {
             plugin.logger.fine { "Registered command from ${instance::class.simpleName}" }
         }
     }
+
+    private fun setupEconomy(): Boolean {
+        val response = server.servicesManager.getRegistration(Economy::class.java) ?: return false
+        economy = response.provider
+        return true
+    }
 }
 
 val plugin: Generators
@@ -59,3 +71,6 @@ get() = JavaPlugin.getPlugin(Generators::class.java)
 
 val configuration: Configuration
 get() = plugin.configuration
+
+val economy: Economy?
+get() = plugin.economy

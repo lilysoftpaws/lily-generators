@@ -10,7 +10,7 @@ import org.incendo.cloud.context.CommandContext
 import pet.lily.generators.database.dao.PlayerDao
 import pet.lily.generators.localization.LocalizationManager
 import pet.lily.generators.localization.sendLocalizedMessage
-import pet.lily.generators.registry.GeneratorRegistry
+import pet.lily.generators.registry.ItemRegistry
 
 object GeneratorsCommand {
     @Command("generators give <type> [target] [quantity]")
@@ -21,7 +21,7 @@ object GeneratorsCommand {
         @Argument("target") target: Player = sender,
         @Argument("quantity") quantity: Int = 1
     ) {
-        val generatorData= GeneratorRegistry.processedGenerators[type]
+        val generatorData= ItemRegistry.processedGenerators[type]
             ?: run {
                 sender.sendLocalizedMessage(
                     key = "generators.give.error",
@@ -83,7 +83,7 @@ object GeneratorsCommand {
 
     @Suggestions("generator-type-suggestions")
     fun generatorTypeSuggestions(context: CommandContext<CommandSender>, input: String): List<String> {
-        return GeneratorRegistry.processedGenerators.keys
+        return ItemRegistry.processedGenerators.keys
             .filter { it.startsWith(input, true) }
     }
 }

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import pet.lily.generators.managers.DropManager
 import pet.lily.generators.managers.GeneratorManager
 import pet.lily.generators.plugin
 import pet.lily.generators.utils.MiniMessageUtils.asComponent
@@ -27,7 +28,7 @@ data class ProcessedGenerator(
     val itemTemplate: ItemStack
 )
 
-object GeneratorRegistry {
+object ItemRegistry {
     private fun buildItemTemplate(material: Material, displayName: Component?, lore: List<Component>?): ItemStack =
         ItemStack(material).apply {
             itemMeta = itemMeta.apply {
@@ -46,6 +47,9 @@ object GeneratorRegistry {
         val displayName = dropConfig.displayName.asComponent()
         val lore = dropConfig.lore.map { it.asComponent() }
         val template = buildItemTemplate(material, displayName, lore)
+        template.editMeta {
+            it.persistentDataContainer.set(DropManager.dropTypeKey, PersistentDataType.STRING, id)
+        }
 
         id to ProcessedDrop(
             id = id,

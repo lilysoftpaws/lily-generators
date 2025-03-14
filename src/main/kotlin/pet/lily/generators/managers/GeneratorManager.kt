@@ -1,5 +1,6 @@
 package pet.lily.generators.managers
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
@@ -12,11 +13,13 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.scheduler.BukkitRunnable
 import pet.lily.generators.Generators
 import pet.lily.generators.database.dao.GeneratorDao
 import pet.lily.generators.localization.sendLocalizedMessage
 import pet.lily.generators.plugin
-import pet.lily.generators.registry.GeneratorRegistry
+import pet.lily.generators.registry.ItemRegistry
+import pet.lily.generators.utils.NumberUtils.formatCurrency
 import pet.lily.generators.utils.ItemStackUtils.getPersistentData
 
 @Suppress("unused")
@@ -25,26 +28,25 @@ object GeneratorManager : Manager, Listener {
 
     override fun initialize(plugin: Generators) {
         plugin.server.pluginManager.registerEvents(this, plugin)
+        startDropSpawningTask()
     }
 
     @EventHandler
     fun BlockPlaceEvent.onBlockPlace() {
-        // check if held item is a generator
         val generatorType = itemInHand.getPersistentData(generatorTypeKey, PersistentDataType.STRING) ?: return
-        val generatorData = GeneratorRegistry.processedGenerators[generatorType] ?: return
+        val generatorData = ItemRegistry.processedGenerators[generatorType] ?: return
 
         // todo: check generator slots
 
-        // play sound and send message
-        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_FLUTE, 2f, 2f)
+        // register the generator in the database
+        GeneratorDao.createGenerator(generatorType, blockPlaced.location, player.uniqueId)
 
+        // play sound and send success message
+        player.playSound(player, Sound.BLOCK_NOTE_BLOCK_FLUTE, 2f, 2f)
         player.sendLocalizedMessage(
             key = "generators.place.success",
             placeholders = mapOf("display-name" to generatorData.displayName)
         )
-
-        // create generator in database
-        GeneratorDao.createGenerator(generatorType, blockPlaced.location, player.uniqueId)
     }
 
     @EventHandler
@@ -59,31 +61,91 @@ object GeneratorManager : Manager, Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    fun PlayerInteractEvent.onPlayerInteract() {
+    fun PlayerInteractEvent.onLeftClick() {
         if (action != Action.LEFT_CLICK_BLOCK || hand != EquipmentSlot.HAND) return
 
         val block = clickedBlock ?: return
         val generatorData = GeneratorDao.getGeneratorByLocation(block.location) ?: return
-        val generatorType = GeneratorRegistry.processedGenerators[generatorData.type] ?: return
+        val generatorType = ItemRegistry.processedGenerators[generatorData.type] ?: return
 
-        // check if player owns the generator
+        // ensure the player owns the generator
         if (generatorData.playerId != player.uniqueId) return
 
-        // cancel the event and remove the generator
+        // remove the generator and update the database
         isCancelled = true
         block.type = Material.AIR
+        GeneratorDao.deleteGenerator(generatorData.id)
 
-        // play sound and send message
+        // return the generator to the player's inventory
+        player.inventory.addItem(generatorType.itemTemplate)
+
+        // play sound and send success message
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_FLUTE, 2f, 2f)
         player.sendLocalizedMessage(
             key = "generators.pickup.success",
             placeholders = mapOf("display-name" to generatorType.displayName)
         )
+    }
 
-        // remove the generator from the database
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun PlayerInteractEvent.onShiftRightClick() {
+        if (action != Action.RIGHT_CLICK_BLOCK || !player.isSneaking || hand != EquipmentSlot.HAND) return
+
+        val block = clickedBlock ?: return
+        val generatorData = GeneratorDao.getGeneratorByLocation(block.location) ?: return
+        val currentGenerator = ItemRegistry.processedGenerators[generatorData.type] ?: return
+
+        // ensure the player owns the generator
+        if (generatorData.playerId != player.uniqueId) return
+
+        // check if there's a next generator to upgrade to
+        val nextGenerator = ItemRegistry.processedGenerators.values
+            .sortedBy { it.price }
+            .firstOrNull { it.price > currentGenerator.price } ?: return
+
+        val upgradeCost = nextGenerator.price - currentGenerator.price
+
+        // check if the player has enough money
+        val playerBalance = plugin.economy.getBalance(player)
+        if (playerBalance < upgradeCost) {
+            player.sendLocalizedMessage(
+                key = "generators.upgrade.insufficient-funds",
+                placeholders = mapOf("cost" to (upgradeCost - playerBalance).formatCurrency())
+            )
+            return
+        }
+
+        // deduct the cost and upgrade the generator
+        plugin.economy.withdrawPlayer(player, upgradeCost)
         GeneratorDao.deleteGenerator(generatorData.id)
+        GeneratorDao.createGenerator(nextGenerator.id, block.location, player.uniqueId)
 
-        // return the generator to the player's inventory
-        player.inventory.addItem(generatorType.itemTemplate)
+        block.type = nextGenerator.material
+        player.playSound(player, Sound.BLOCK_ANVIL_USE, 1f, 1f)
+        player.sendLocalizedMessage(
+            key = "generators.upgrade.success",
+            placeholders = mapOf("display-name" to nextGenerator.displayName)
+        )
+    }
+
+    private fun startDropSpawningTask() {
+        val tickRate = plugin.configuration.main.generatorTickRate.toLong()
+
+        object : BukkitRunnable() {
+            override fun run() {
+                Bukkit.getOnlinePlayers().forEach { player ->
+                    val generators = GeneratorDao.getGeneratorsByPlayer(player.uniqueId)
+                    generators.forEach { generator ->
+                        val chunk = generator.location.chunk
+                        if (!chunk.isLoaded) return
+
+                        val generatorType = ItemRegistry.processedGenerators[generator.type] ?: return
+                        val drop = generatorType.drop
+
+                        generator.location.world?.dropItemNaturally(generator.location.add(0.5, 1.0, 0.5), drop.itemTemplate)
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, tickRate, tickRate)
     }
 }
