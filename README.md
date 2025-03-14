@@ -11,7 +11,7 @@
 - Lightweight and performant (can support upwards of 100,000 generators)
 - Highly customizable
 - Internationalization support
-- Easy to use API (see [API.md](API.md))
+- ~~Easy to use API (see [API.md](API.md))~~
 
 ### Installation
 Just download the latest release from the [releases page](https://github.com/lilysoftpaws/lily-generators/releases) and place the jar file in the `plugins` folder of your [Paper](https://papermc.io/) server.
