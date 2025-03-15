@@ -14,6 +14,10 @@
 - ~~Easy to use API (see [API.md](API.md))~~
 
 ### Installation
+
+> [!WARNING]
+> This plugin is in development and may have bugs, though it’s been tested and should work reliably.
+
 Just download the latest release from the [releases page](https://github.com/lilysoftpaws/lily-generators/releases) and place the jar file in the `plugins` folder of your [Paper](https://papermc.io/) server.
 
 ### Configuration
