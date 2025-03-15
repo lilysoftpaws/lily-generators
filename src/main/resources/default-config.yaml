@@ -1,6 +1,8 @@
 ---
 main:
   generator-tick-rate: 20  # ticks between generator spawns
+  default-language-locale: en # default locale for players
+  default-generator-slots: 5 # number of slots for a new player
 database:
   database-path: database.sqlite
 generators:

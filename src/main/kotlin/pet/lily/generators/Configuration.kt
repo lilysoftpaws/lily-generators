@@ -15,7 +15,9 @@ data class Configuration(
 
 @Serializable
 data class MainConfiguration(
-    @SerialName("generator-tick-rate") val generatorTickRate: Int = 20
+    @SerialName("generator-tick-rate") val generatorTickRate: Int = 20,
+    @SerialName("default-language-locale") val defaultLanguageLocale: String = "en",
+    @SerialName("default-generator-slots") val defaultGeneratorSlots: Int = 5
 )
 
 @Serializable
