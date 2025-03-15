@@ -1,6 +1,7 @@
 package pet.lily.generators.localization
 
 import net.kyori.adventure.text.Component
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import pet.lily.generators.database.dao.PlayerDao
 import pet.lily.generators.utils.MiniMessageUtils.asComponent
@@ -31,4 +32,14 @@ fun Player.sendLocalizedMessage(
     val prefix = if (prefixed) LocalizationManager.getMessage("prefix", locale) else Component.empty()
 
     sendMessage(prefix.append(message))
+}
+
+fun CommandSender.sendLocalizedMessage(
+    key: String,
+    prefixed: Boolean = true,
+    placeholders: Map<String, Any> = emptyMap()
+) {
+    if (this is Player) {
+        sendLocalizedMessage(key, prefixed, placeholders)
+    }
 }
