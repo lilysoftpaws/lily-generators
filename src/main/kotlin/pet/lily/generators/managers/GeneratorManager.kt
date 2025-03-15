@@ -17,6 +17,7 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
 import pet.lily.generators.Generators
 import pet.lily.generators.database.dao.GeneratorDao
+import pet.lily.generators.database.dao.PlayerDao
 import pet.lily.generators.localization.sendLocalizedMessage
 import pet.lily.generators.plugin
 import pet.lily.generators.registry.ItemRegistry
@@ -36,7 +37,18 @@ object GeneratorManager : IManager, Listener {
         val generatorType = itemInHand.getPersistentData(generatorTypeKey, PersistentDataType.STRING) ?: return
         val generatorData = ItemRegistry.processedGenerators[generatorType] ?: return
 
-        // todo: check generator slots
+        // check generator slots
+        val playerSlots = PlayerDao.getPlayerSlots(player.uniqueId)
+        val playerGenerators = GeneratorDao.getGeneratorsByPlayer(player.uniqueId).size
+
+        if (playerGenerators >= playerSlots) {
+            player.sendLocalizedMessage(
+                key = "generators.place.limit-reached",
+                placeholders = mapOf("slots" to playerSlots)
+            )
+            isCancelled = true
+            return
+        }
 
         // register the generator in the database
         GeneratorDao.createGenerator(generatorType, blockPlaced.location, player.uniqueId)

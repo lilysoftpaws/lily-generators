@@ -6,6 +6,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import pet.lily.generators.Generators
 import pet.lily.generators.database.dao.PlayerDao
 import pet.lily.generators.localization.LocalizationManager
+import pet.lily.generators.plugin
 
 object PlayerManager : IManager, Listener {
     override fun initialize(plugin: Generators) {
@@ -20,7 +21,8 @@ object PlayerManager : IManager, Listener {
 
             PlayerDao.createPlayer(
                 player.uniqueId,
-                if (availableLocales.contains(playerLocale)) playerLocale else "en"
+                if (availableLocales.contains(playerLocale)) playerLocale else plugin.configuration.main.defaultLanguageLocale,
+                plugin.configuration.main.defaultGeneratorSlots
             )
         }
     }
