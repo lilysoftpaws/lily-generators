@@ -57,7 +57,11 @@ object GeneratorManager : IManager, Listener {
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_FLUTE, 2f, 2f)
         player.sendLocalizedMessage(
             key = "generators.place.success",
-            placeholders = mapOf("display-name" to generatorData.displayName)
+            placeholders = mapOf(
+                "display-name" to generatorData.displayName,
+                "max-slots" to playerSlots,
+                "slots" to playerGenerators + 1
+            )
         )
     }
 
@@ -83,6 +87,10 @@ object GeneratorManager : IManager, Listener {
         // ensure the player owns the generator
         if (generatorData.playerId != player.uniqueId) return
 
+        // check generator slots
+        val playerSlots = PlayerDao.getPlayerSlots(player.uniqueId)
+        val playerGenerators = GeneratorDao.getGeneratorsByPlayer(player.uniqueId).size
+
         // remove the generator and update the database
         isCancelled = true
         block.type = Material.AIR
@@ -95,7 +103,11 @@ object GeneratorManager : IManager, Listener {
         player.playSound(player, Sound.BLOCK_NOTE_BLOCK_FLUTE, 2f, 2f)
         player.sendLocalizedMessage(
             key = "generators.pickup.success",
-            placeholders = mapOf("display-name" to generatorType.displayName)
+            placeholders = mapOf(
+                "display-name" to generatorType.displayName,
+                "max-slots" to playerSlots,
+                "slots" to playerGenerators - 1
+            )
         )
     }
 
