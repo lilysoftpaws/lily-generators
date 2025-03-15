@@ -10,7 +10,7 @@ import org.incendo.cloud.context.CommandContext
 import pet.lily.generators.localization.sendLocalizedMessage
 import pet.lily.generators.registry.ItemRegistry
 
-object GeneratorGiveCommand : ICommand {
+object GeneratorsGiveCommand : ICommand {
     @Command("generators give <type> [target] [quantity]")
     @Permission("generators.give")
     fun generatorsGive(
