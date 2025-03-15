@@ -1,6 +1,7 @@
 package pet.lily.generators.managers
 
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
@@ -22,8 +23,7 @@ import pet.lily.generators.registry.ItemRegistry
 import pet.lily.generators.utils.NumberUtils.formatCurrency
 import pet.lily.generators.utils.ItemStackUtils.getPersistentData
 
-@Suppress("unused")
-object GeneratorManager : Manager, Listener {
+object GeneratorManager : IManager, Listener {
     val generatorTypeKey = NamespacedKey(plugin, "generators.generator-type")
 
     override fun initialize(plugin: Generators) {
@@ -133,16 +133,27 @@ object GeneratorManager : Manager, Listener {
 
         object : BukkitRunnable() {
             override fun run() {
+                val loadedChunks = mutableSetOf<Chunk>()
+
                 Bukkit.getOnlinePlayers().forEach { player ->
                     val generators = GeneratorDao.getGeneratorsByPlayer(player.uniqueId)
+
                     generators.forEach { generator ->
-                        val chunk = generator.location.chunk
-                        if (!chunk.isLoaded) return
+                        val location = generator.location
+                        val chunk = location.chunk
+
+                        if (!loadedChunks.contains(chunk)) {
+                            if (!chunk.isLoaded) return
+                            loadedChunks.add(chunk)
+                        }
 
                         val generatorType = ItemRegistry.processedGenerators[generator.type] ?: return
                         val drop = generatorType.drop
 
-                        generator.location.world?.dropItemNaturally(generator.location.add(0.5, 1.0, 0.5), drop.itemTemplate)
+                        location.world?.dropItemNaturally(
+                            location.add(0.5, 1.0, 0.5),
+                            drop.itemTemplate
+                        )
                     }
                 }
             }

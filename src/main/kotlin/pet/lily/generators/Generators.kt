@@ -1,17 +1,18 @@
 package pet.lily.generators
 
 import net.milkbowl.vault.economy.Economy
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 import org.incendo.cloud.SenderMapper
 import org.incendo.cloud.annotations.AnnotationParser
-import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.kotlin.coroutines.annotations.installCoroutineSupport
 import org.incendo.cloud.paper.LegacyPaperCommandManager
+import pet.lily.generators.commands.ICommand
 import pet.lily.generators.database.DatabaseFactory
 import pet.lily.generators.localization.LocalizationManager
-import pet.lily.generators.managers.Manager
+import pet.lily.generators.managers.IManager
 import pet.lily.generators.utils.ReflectionUtils
 import java.io.File
 
@@ -27,6 +28,7 @@ class Generators : JavaPlugin() {
 
         if (!setupEconomy()) {
             logger.warning { "Vault not found, disabling plugin" }
+            Bukkit.getPluginManager().disablePlugin(this)
             return
         }
 
@@ -39,7 +41,7 @@ class Generators : JavaPlugin() {
         DatabaseFactory.initialize(File(dataFolder, configuration.database.databasePath).path)
 
         // initialize managers
-        ReflectionUtils.getImplementations<Manager>("pet.lily.generators.managers").forEach {
+        ReflectionUtils.getImplementations<IManager>("pet.lily.generators.managers").forEach {
             it.initialize(plugin)
             plugin.logger.fine { "Initialized manager $it" }
         }
@@ -49,13 +51,9 @@ class Generators : JavaPlugin() {
         val annotationParser = AnnotationParser(commandManager, CommandSender::class.java)
         annotationParser.installCoroutineSupport()
 
-        val instances = listOf(
-            ReflectionUtils.getAnnotatedMethods<Command>("pet.lily.generators.commands").map { it.first },
-        ).flatten().distinct()
-
-        instances.forEach { instance ->
-            annotationParser.parse(instance)
-            plugin.logger.fine { "Registered command from ${instance::class.simpleName}" }
+        ReflectionUtils.getImplementations<ICommand>("pet.lily.generators.commands").forEach {
+            annotationParser.parse(it)
+            plugin.logger.fine { "Registered commands and suggestions in ${it::class.simpleName}" }
         }
     }
 
@@ -68,9 +66,3 @@ class Generators : JavaPlugin() {
 
 val plugin: Generators
 get() = JavaPlugin.getPlugin(Generators::class.java)
-
-val configuration: Configuration
-get() = plugin.configuration
-
-val economy: Economy?
-get() = plugin.economy

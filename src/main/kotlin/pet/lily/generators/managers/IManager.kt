@@ -2,6 +2,6 @@ package pet.lily.generators.managers
 
 import pet.lily.generators.Generators
 
-interface Manager {
+interface IManager {
     fun initialize(plugin: Generators)
 }

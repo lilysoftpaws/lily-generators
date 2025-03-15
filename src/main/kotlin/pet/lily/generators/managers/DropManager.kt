@@ -15,8 +15,7 @@ import pet.lily.generators.registry.ItemRegistry
 import pet.lily.generators.utils.NumberUtils.formatCurrency
 import pet.lily.generators.utils.ItemStackUtils.getPersistentData
 
-@Suppress("unused")
-object DropManager : Manager, Listener {
+object DropManager : IManager, Listener {
     val dropTypeKey = NamespacedKey(plugin, "generators.drop-type")
 
     override fun initialize(plugin: Generators) {

@@ -10,44 +10,11 @@ import org.incendo.cloud.context.CommandContext
 import pet.lily.generators.database.dao.PlayerDao
 import pet.lily.generators.localization.LocalizationManager
 import pet.lily.generators.localization.sendLocalizedMessage
-import pet.lily.generators.registry.ItemRegistry
 
-object GeneratorsCommand {
-    @Command("generators give <type> [target] [quantity]")
-    @Permission("generators.give")
-    fun give(
-        sender: Player,
-        @Argument("type", suggestions = "generator-type-suggestions") type: String,
-        @Argument("target") target: Player = sender,
-        @Argument("quantity") quantity: Int = 1
-    ) {
-        val generatorData= ItemRegistry.processedGenerators[type]
-            ?: run {
-                sender.sendLocalizedMessage(
-                    key = "generators.give.error",
-                    placeholders = mapOf("type" to type)
-                )
-                return
-            }
-
-        val item = generatorData.itemTemplate.clone().apply {
-            amount = quantity.coerceIn(1, 64)
-        }
-
-        target.inventory.addItem(item)
-        sender.sendLocalizedMessage(
-            key = "generators.give.success",
-            placeholders = mapOf(
-                "quantity" to item.amount.toString(),
-                "display-name" to generatorData.displayName,
-                "target" to target.name
-            )
-        )
-    }
-
+object GeneratorsLocaleCommand : ICommand {
     @Command("generators locale [locale]")
     @Permission("generators.locale")
-    fun locale(
+    fun generatorsLocale(
         sender: Player,
         @Argument("locale", suggestions = "locale-suggestions") locale: String
     ) {
@@ -78,12 +45,7 @@ object GeneratorsCommand {
 
     @Suggestions("locale-suggestions")
     fun localeSuggestions(context: CommandContext<CommandSender>, input: String): List<String> {
-        return LocalizationManager.availableLocales.filter { it.startsWith(input, ignoreCase = true) }
-    }
-
-    @Suggestions("generator-type-suggestions")
-    fun generatorTypeSuggestions(context: CommandContext<CommandSender>, input: String): List<String> {
-        return ItemRegistry.processedGenerators.keys
-            .filter { it.startsWith(input, true) }
+        return LocalizationManager.availableLocales
+            .filter { it.startsWith(input, ignoreCase = true) }
     }
 }

@@ -7,8 +7,7 @@ import pet.lily.generators.Generators
 import pet.lily.generators.database.dao.PlayerDao
 import pet.lily.generators.localization.LocalizationManager
 
-@Suppress("unused")
-object PlayerManager : Manager, Listener {
+object PlayerManager : IManager, Listener {
     override fun initialize(plugin: Generators) {
         plugin.server.pluginManager.registerEvents(this, plugin)
     }
